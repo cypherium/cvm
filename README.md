@@ -1,8 +1,8 @@
 # Cypherium Virtual Machine Specification (Draft)
-The Cypherium Virtual Machine (CVM) is a register-based virtual machine inspired by the [Dalvik] (https://source.android.com/devices/tech/dalvik/)
-(now part of the Android Runtime) architecture. The virtual machine from [Ethereum VM] (https://github.com/ethereum/wiki/wiki/White-Paper) and 
-[NEO VM] (https://github.com/neo-project/neo-vm) also influenced its design. It is used for executing smart contracts on the Cypherium blockchain platform. 
-A reference implementation is provided using the [Go language] (https://golang.org/).
+The Cypherium Virtual Machine (CVM) is a register-based virtual machine inspired by the [Dalvik](https://source.android.com/devices/tech/dalvik/)
+(now part of the Android Runtime) architecture. The virtual machine from [Ethereum VM](https://github.com/ethereum/wiki/wiki/White-Paper) and 
+[NEO VM](https://github.com/neo-project/neo-vm) also influenced its design. It is used for executing smart contracts on the Cypherium blockchain platform. 
+A reference implementation is provided using the [Go language](https://golang.org/).
 
 ## Design Principle
 CVM favors small and simple smart contracts that preferably only use the 65536 available registers without allocating extra memory. 
@@ -20,10 +20,10 @@ contracts and their codes will be under public scrutiny.
 namely, up to 65536) as well as any adjunct data needed to execute the contract. 
 * Each contract can access and manipulate data from 5 locations:
   1. Registers from its own contract frame (r/w)
-  2. Persistent contract storage (r/w)
-  3. On-chain data (ro)
-  4. Message from the transaction that triggered the contract (ro)
-  5. An **optional** infinitely expending memory (r/w) 
+  1. Persistent contract storage (r/w)
+  1. On-chain data (ro)
+  1. Message from the transaction that triggered the contract (ro)
+  1. An **optional** infinitely expending memory (r/w) 
 * All memory region but the persistent contract storage will be cleared and deallocated upon exit.
 * Use relative offset for jumping/branching
 * Gas mechanism similar to that of the EVM
