@@ -37,9 +37,10 @@ namely, up to 65536) as well as any adjunct data needed to execute the contract.
 * Registers are 256-bit each in size
 
 ## Call Convention
-If a contract is invoked by another contract, it will be provided with a message containing the input parameters. When the contract terminates normally, it is
-possible to pass results back its caller. Upon returning, the last register of the caller contains the number of registers (N) that stores the information from
-its latest callee. Therefore, the registers 65536-N to 65535 store the information passed from the callee.
+If a contract is invoked by another contract, it will be provided with a message containing the input parameters. The message will be comprised of the last N registers
+up to register 65535 and the N is specified in the register 65536. When the contract terminates normally, it is possible to pass results back its caller. Upon 
+returning, the last register of the caller contains the number of registers (N) that stores the information from its latest callee. Therefore, the last N registers 
+up to 65535 store the information passed from the callee.
 
 ## Instruction Sets
 * 256 (0x100) opcodes, 
@@ -58,8 +59,8 @@ its latest callee. Therefore, the registers 65536-N to 65535 store the informati
   + JMPIF %A %B 
 - JMPIFNOT : if !%B: PC += %A
   + JMPIFNOT %A %B
-- CALL : Call another contract with the contract address in %A and sending message address in %B
-  + CALL %A %B
+- CALL : Call another contract with the contract address in %A 
+  + CALL %A 
 - RET: Return control to the caller
   + RET
 - CREATE : Create a smart contract
@@ -123,7 +124,7 @@ its latest callee. Therefore, the registers 65536-N to 65535 store the informati
 - STSTG : Store %B to storage index %A
   + STSTG %A %B
 
-### Arithmatic  (0x051 - 0x090)
+### Arithmetic  (0x051 - 0x090)
 - INC : %A += 1
   + INC %A
 - DEC : %A -= 1
