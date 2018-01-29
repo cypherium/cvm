@@ -21,7 +21,6 @@
 package cvm
 
 import (
-	"encoding/hex"
 	"fmt"
 	"math/big"
 	"testing"

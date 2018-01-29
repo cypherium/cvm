@@ -20,6 +20,10 @@
 
 package cvm
 
+import (
+	"encoding/hex"
+)
+
 type ContractAccount struct {
 	Address uint64
 	Code    []byte
