@@ -96,7 +96,14 @@ func (cf *ContractFrame) CallContractFrame(ctc *Contract) error {
  */
 func (cf *ContractFrame) Execute() error {
 	cf.contract.PrintCode(cf.log)
+	/*
+	 * A jump out of the code would result an immediate return, the compiler
+	 * should ensure a valid jump
+	 */
 	for cf.pc < uint64(len(cf.contract.Code)) {
+		if cf.gas == 0 {
+			return ErrorOutOfGas
+		}
 		opIdx := cf.contract.Code[cf.pc]
 		op := cf.Operations[opIdx]
 		regIdx := make([]uint64, op.regNum)
@@ -104,10 +111,10 @@ func (cf *ContractFrame) Execute() error {
 			offset := cf.pc + 1 + RegLen*uint64(i)
 			regIdx[i] = uint64(binary.BigEndian.Uint16(cf.contract.Code[offset : offset+2]))
 		}
-		cf.log.Println("pc:", cf.pc, "opname:", op.name, "Regs:", regIdx)
-		if err := op.execute(cf, regIdx, &op); err != nil {
+		cf.log.Println("pc:", cf.pc, "opname:", op.name, "Regs:", regIdx, "gas", cf.gas)
+		if exeErr := op.execute(cf, regIdx, &op); exeErr != nil {
 			//log.Println(err.Error())
-			return err
+			return exeErr
 		}
 		cf.rf.Print(cf.log)
 	}

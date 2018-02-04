@@ -32,9 +32,30 @@ type CVM struct {
 	cf       *ContractFrame
 }
 
-func TestCvm(t *testing.T) {
+func TestCvmFunc(t *testing.T) {
 	cvm := CVM{
 		GasLimit: 1000,
+		GasPrice: big.NewInt(10),
+	}
+	//Create a VM contract instance using an account's public address
+	contract0 := NewContract(0, 0, nil, big.NewInt(100), cvm.GasLimit, cvm.GasPrice)
+	contract1 := NewContract(1, 0, nil, big.NewInt(100), cvm.GasLimit, cvm.GasPrice)
+	//Create a context associated with the given contract
+	cvm.cf = NewContractFrame(contract0)
+	if err := cvm.cf.Execute(); err != nil {
+		t.Errorf("%s\n", err.Error())
+	}
+	fmt.Printf("End of execution\n")
+	cvm.cf = NewContractFrame(contract1)
+	if err := cvm.cf.Execute(); err != nil {
+		t.Errorf("%s\n", err.Error())
+	}
+	fmt.Printf("End of execution\n")
+}
+
+func TestCvmGas(t *testing.T) {
+	cvm := CVM{
+		GasLimit: 5,
 		GasPrice: big.NewInt(10),
 	}
 	//Create a VM contract instance using an account's public address

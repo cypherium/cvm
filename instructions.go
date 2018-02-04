@@ -28,12 +28,22 @@ func incrementPc(pc *uint64, op *operation) {
 	*pc += (OpLen + op.regNum*RegLen)
 }
 
+func decrementGas(gas *uint64, op *operation) {
+	if *gas < op.gasCost {
+		*gas = 0
+	} else {
+		*gas -= op.gasCost
+	}
+}
+
 func opNop(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	cf.pc += OpLen
 	return nil
 }
 
 func opJmp(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	rf := cf.rf
 	idxA := regIdx[0]
 	regA := rf.Read(idxA)
@@ -42,12 +52,14 @@ func opJmp(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opJmpi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	offset := regIdx[0]
 	cf.pc += offset
 	return nil
 }
 
 func opJmpif(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	rf := cf.rf
 	idxB := regIdx[1]
 	regB := rf.Read(idxB)
@@ -61,6 +73,7 @@ func opJmpif(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opJmpifnot(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	rf := cf.rf
 	idxB := regIdx[1]
 	regB := rf.Read(idxB)
@@ -74,6 +87,7 @@ func opJmpifnot(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opCall(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -102,6 +116,7 @@ func opCall(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opRet(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	rfCaller := cf.caller.rf
@@ -116,6 +131,7 @@ func opRet(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opAnd(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -128,6 +144,7 @@ func opAnd(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opOr(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -140,6 +157,7 @@ func opOr(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opXor(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -152,6 +170,7 @@ func opXor(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opNot(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -162,6 +181,7 @@ func opNot(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opByte(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -181,6 +201,7 @@ func opByte(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMov(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -191,6 +212,7 @@ func opMov(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMovi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -200,6 +222,7 @@ func opMovi(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opLdMsg(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	msg := cf.contract.Input
 	rf := cf.rf
@@ -220,6 +243,7 @@ func opLdMsg(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opLdMem(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	mem := cf.mem
 	rf := cf.rf
@@ -240,6 +264,7 @@ func opLdMem(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opLdStg(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	stg := cf.contract.Storage
 	rf := cf.rf
@@ -260,6 +285,7 @@ func opLdStg(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opStMem(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	mem := cf.mem
 	rf := cf.rf
@@ -279,6 +305,7 @@ func opStMem(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opStStg(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	stg := cf.contract.Storage
 	rf := cf.rf
@@ -295,6 +322,7 @@ func opStStg(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opInc(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -305,6 +333,7 @@ func opInc(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opDec(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxA := regIdx[0]
@@ -315,6 +344,7 @@ func opDec(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opAdd(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -328,6 +358,7 @@ func opAdd(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opAddi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -340,6 +371,7 @@ func opAddi(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opSub(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -353,6 +385,7 @@ func opSub(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opSubi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -365,6 +398,7 @@ func opSubi(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMul(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -378,6 +412,7 @@ func opMul(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMuli(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -390,6 +425,7 @@ func opMuli(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opDiv(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -407,6 +443,7 @@ func opDiv(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opDivi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -423,6 +460,7 @@ func opDivi(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMod(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -440,6 +478,7 @@ func opMod(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opModi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -456,6 +495,7 @@ func opModi(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opExp(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -470,6 +510,7 @@ func opExp(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opExpi(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -483,6 +524,7 @@ func opExpi(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opEq(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -499,6 +541,7 @@ func opEq(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opLt(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -515,6 +558,7 @@ func opLt(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opGt(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -531,6 +575,7 @@ func opGt(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opLte(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -547,6 +592,7 @@ func opLte(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opGte(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -563,6 +609,7 @@ func opGte(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMax(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
@@ -579,6 +626,7 @@ func opMax(cf *ContractFrame, regIdx []uint64, op *operation) error {
 }
 
 func opMin(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
 	rf := cf.rf
 	idxC := regIdx[0]
