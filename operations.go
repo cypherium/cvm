@@ -28,7 +28,6 @@ const (
 	NOP OpCode = iota
 	ABORT
 	JMP
-	JMPI
 	JMPIF
 	JMPIFNOT
 	CALL
@@ -43,8 +42,6 @@ const (
 	XOR
 	NOT
 	BYTE
-	SHL
-	SHR
 )
 
 //Load/Store
@@ -111,13 +108,6 @@ func NewOperationSet() OperationSet {
 			gasCost: 2,
 			regNum:  1,
 			name:    "opJmp",
-		},
-
-		JMPI: {
-			execute: opJmpi,
-			gasCost: 2,
-			regNum:  1,
-			name:    "opJmpi",
 		},
 
 		JMPIF: {

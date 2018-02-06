@@ -47,25 +47,19 @@ func opJmp(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	rf := cf.rf
 	idxA := regIdx[0]
 	regA := rf.Read(idxA)
-	cf.pc += regA.Uint64()
-	return nil
-}
-
-func opJmpi(cf *ContractFrame, regIdx []uint64, op *operation) error {
-	defer decrementGas(&cf.gas, op)
-	offset := regIdx[0]
-	cf.pc += offset
+	cf.pc = regA.Uint64()
 	return nil
 }
 
 func opJmpif(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	defer decrementGas(&cf.gas, op)
 	rf := cf.rf
+	idxA := regIdx[0]
 	idxB := regIdx[1]
 	regB := rf.Read(idxB)
 	if regB.Cmp(big.NewInt(0)) != 0 {
-		offset := regIdx[0]
-		cf.pc += offset
+		offset := rf.Read(idxA).Uint64()
+		cf.pc = offset
 	} else {
 		cf.pc += (OpLen + op.regNum*RegLen)
 	}
@@ -75,11 +69,12 @@ func opJmpif(cf *ContractFrame, regIdx []uint64, op *operation) error {
 func opJmpifnot(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	defer decrementGas(&cf.gas, op)
 	rf := cf.rf
+	idxA := regIdx[0]
 	idxB := regIdx[1]
 	regB := rf.Read(idxB)
 	if regB.Cmp(big.NewInt(0)) == 0 {
-		offset := regIdx[0]
-		cf.pc += offset
+		offset := rf.Read(idxA).Uint64()
+		cf.pc = offset
 	} else {
 		cf.pc += (OpLen + op.regNum*RegLen)
 	}

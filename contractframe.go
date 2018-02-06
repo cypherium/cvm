@@ -34,7 +34,8 @@ type ContractFrame struct {
 	contract   *Contract
 	depth      uint64 //Current call depth
 	pc         uint64 //Program counter
-	gas        uint64
+	jmpc       uint64 //Conditional jump counter
+	gas        uint64 //Remaining gas counter
 	Operations OperationSet
 
 	call   bool           //If this contract is called by another
@@ -100,7 +101,7 @@ func (cf *ContractFrame) Execute() error {
 	 * A jump out of the code would result an immediate return, the compiler
 	 * should ensure a valid jump
 	 */
-	for cf.pc < uint64(len(cf.contract.Code)) {
+	for cf.pc < uint64(len(cf.contract.Code)) && cf.pc >= 0 {
 		if cf.gas == 0 {
 			return ErrorOutOfGas
 		}
@@ -111,7 +112,7 @@ func (cf *ContractFrame) Execute() error {
 			offset := cf.pc + 1 + RegLen*uint64(i)
 			regIdx[i] = uint64(binary.BigEndian.Uint16(cf.contract.Code[offset : offset+2]))
 		}
-		cf.log.Println("pc:", cf.pc, "opname:", op.name, "Regs:", regIdx, "gas", cf.gas)
+		cf.log.Println("pc:", cf.pc, "opname:", op.name, "regs:", regIdx, "gas", cf.gas)
 		if exeErr := op.execute(cf, regIdx, &op); exeErr != nil {
 			//log.Println(err.Error())
 			return exeErr
