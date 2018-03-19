@@ -21,6 +21,7 @@
 package cvm
 
 import (
+	"golang.org/x/crypto/sha3"
 	"math/big"
 )
 
@@ -639,5 +640,18 @@ func opMin(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	} else {
 		rf.Write(idxC, regB)
 	}
+	return nil
+}
+
+func opSHA3(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
+	defer incrementPc(&cf.pc, op)
+	rf := cf.rf
+	idxA := regIdx[0]
+	idxB := regIdx[1]
+	regA := rf.Read(idxA).Bytes()
+	digest := make([]byte, 64)
+	sha3.ShakeSum256(digest, regA)
+	rf.Write(idxB, new(big.Int).SetBytes(digest))
 	return nil
 }

@@ -191,6 +191,9 @@ In this section, the instant values ($INS) are interpreted as 64-bit signed inte
   + MINI %C %A $INS
 
 ### Cryptography (0x091 - 0x100)
-- SHA3
+- SHA3 : %B = SHA3-256(%A)
+  + SHA3 %B %A
+- SHA3M : %B = MEM[%A:%A+$INS]
+  + SHA3M %B %A $INS
 - CHKSIG
 - CHKMULSIG

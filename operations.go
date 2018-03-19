@@ -43,11 +43,9 @@ const (
 	XOR
 	NOT
 	BYTE
-	SHL
-	SHR
 )
 
-//Load/Store
+//Load&Store
 const (
 	MOV OpCode = iota + 0x41
 	MOVI
@@ -83,6 +81,11 @@ const (
 	GTE
 	MAX
 	MIN
+)
+
+//Cryptographic ops
+const (
+	SHA3 OpCode = iota + 0x91
 )
 
 type operation struct {
@@ -381,5 +384,19 @@ func NewOperationSet() OperationSet {
 			regNum:  3,
 			name:    "opMin",
 		},
+
+		SHA3: {
+			execute: opSHA3,
+			gasCost: 200,
+			regNum:  2,
+			name:    "opSHA3",
+		},
+
+		//SHA3m: {
+		//	execute: opSHA3M,
+		//	gasCost: 200,
+		//	regNum:  3,
+		//	name:    "opSHA3M",
+		//},
 	}
 }
