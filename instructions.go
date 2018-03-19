@@ -645,8 +645,7 @@ func opSHA3(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	idxA := regIdx[0]
 	idxB := regIdx[1]
 	regA := rf.Read(idxA).Bytes()
-	digest := make([]byte, 64)
-	sha3.ShakeSum256(digest, regA)
-	rf.Write(idxB, new(big.Int).SetBytes(digest))
+	digest := sha3.Sum256(regA)
+	rf.Write(idxB, new(big.Int).SetBytes(digest[:]))
 	return nil
 }

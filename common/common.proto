@@ -1,0 +1,169 @@
+/*
+ * Copyright (C) 2018 The Cypherium Blockchain authors
+ *
+ * This file is part of the Cypherium Blockchain library.
+ *
+ * The Cypherium Blockchain library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The Cypherium Blockchain library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Cypherium Blockchain library. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/*
+ *  Definition of the data structure
+ */
+
+syntax="proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//32 byte Ed25519 public key
+message PubKey{
+    fixed64 _pubkey_1 = 1;
+    fixed64 _pubkey_2 = 2;
+    fixed64 _pubkey_3 = 3;
+    fixed64 _pubkey_4 = 4;
+}
+
+//64 byte Ed25519 public key
+message PrivKey{
+    fixed64 _privkey_1 = 1;
+    fixed64 _privkey_2 = 2;
+    fixed64 _privkey_3 = 3;
+    fixed64 _privkey_4 = 4;
+    fixed64 _privkey_5 = 5;
+    fixed64 _privkey_6 = 6;
+    fixed64 _privkey_7 = 7;
+    fixed64 _privkey_8 = 8;
+}
+
+//32 byte SHA3-256 hash
+message Hash {
+    fixed64 _hash_1 = 1;
+    fixed64 _hash_2 = 2;
+    fixed64 _hash_3 = 3;
+    fixed64 _hash_4 = 4;
+}
+
+//20 byte address
+message Address {
+    fixed32 _addr_1 = 1;
+    fixed32 _addr_2 = 2;
+    fixed32 _addr_3 = 3;
+    fixed32 _addr_4 = 4;
+    fixed32 _addr_5 = 5;
+}
+
+//64 byte signature
+message Signature {
+    fixed64 _sign_1 = 1;
+    fixed64 _sign_2 = 2;
+    fixed64 _sign_3 = 3;
+    fixed64 _sign_4 = 4;
+    fixed64 _sign_5 = 5;
+    fixed64 _sign_6 = 6;
+    fixed64 _sign_7 = 7;
+    fixed64 _sign_8 = 8;
+}
+
+//64 byte Cosi signature
+message CosiSign {
+    Signature _sign = 1;
+}
+
+//64 byte Cosi aggregated address
+message CosiAggr {
+    fixed64 _aggr_1 = 1;
+    fixed64 _aggr_2 = 2;
+    fixed64 _aggr_3 = 3;
+    fixed64 _aggr_4 = 4;
+    fixed64 _aggr_5 = 5;
+    fixed64 _aggr_6 = 6;
+    fixed64 _aggr_7 = 7;
+    fixed64 _aggr_8 = 8;
+}
+
+// Accounts
+message Account {
+    uint32  Version = 1;
+    uint32  Type    = 2;   
+    Address Address = 3;
+    uint32  Latency = 4;
+    uint64  Deposit = 5;
+    bytes   Code    = 6;
+    bytes   Storage = 7;
+}
+
+message Coinbase {
+    uint64   NumCommittee = 1;
+    repeated Address Committee = 2;
+    uint64   Quantity = 3;
+}
+
+message Transaction {
+    uint32     Version   = 1;
+    uint32     Type      = 2;
+    PubKey     SenderKey = 3;
+    Signature  SenderSig = 4;
+    Address    Recipient = 5;
+    uint64     Quantity  = 6;
+    bytes      Data      = 7;
+    uint64     AvailGas  = 8;
+    uint64     GasPrice  = 9;
+}
+
+message TxBlock {
+    uint32    Version       = 1;
+    uint32    Type          = 2;
+    Hash      KblkHash      = 3;
+    google.protobuf.Timestamp Timestamp  =4;
+    //uint64    Timestamp     = 4; 
+    Hash      MklRoot       = 5;
+    Coinbase  Coinbase      = 6;
+    CosiSign  KblkCosiSign  = 7;
+    CosiAggr  KblkCosiAggr  = 8;
+    uint64    TxCnt         = 9;
+    repeated Transaction Tx = 10;
+}
+
+message PoW {
+    Hash     PrevHah    = 1;
+    uint64   Difficulty = 2;
+    google.protobuf.Timestamp Timestamp  =3;
+    //uint64   Timestamp  = 3;
+    Address  Worker     = 4;
+    uint64   Nonce      = 5;
+}
+
+message KeyBlock {
+    uint32    Version      = 1;
+    google.protobuf.Timestamp Timestamp  =2;
+    //uint64    Timestamp    = 2;
+    Hash      PrevHash     = 3;
+    Hash      MklRoot      = 4;
+    CosiSign  KblkCosiSign = 5;
+    CosiAggr  KblkCosiAggr = 6;
+    uint64    NumPow       = 7;
+    repeated PoW Pows      = 8;
+}
+
+message AccountPool {
+    repeated Account Accounts = 1;
+}
+
+message TxBlockPool {
+    repeated TxBlock TxBlocks = 1;
+}
+
+message KeyBlockPool {
+    repeated KeyBlock KeyBlocks = 1;
+}
