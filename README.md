@@ -37,7 +37,6 @@ contracts and their codes will be under public scrutiny.
   1. An **optional** infinitely expending memory (r/w) 
 * All memory region but the persistent contract storage will be cleared and 
   deallocated upon exit.
-* Use relative offset for jumping/branching
 * Gas mechanism similar to that of the EVM
 * Use a PC counter to keep track of the next instruction
 * Iteration counter (counts conditional jumps to prevent dead loops)
@@ -69,12 +68,11 @@ caller's last N registers.
   + NOP
 - ABORT : Abort the current execution and reverse all the changes
   + ABORT
-- JMP : PC += %A/$INS
+- JMP : PC = %A/$INS
   + JMP %A 
-  + JMPI $INS
-- JMPIF : if %B: PC += %A
+- JMPIF : if %B: PC = %A
   + JMPIF %A %B 
-- JMPIFNOT : if !%B: PC += %A
+- JMPIFNOT : if !%B: PC = %A
   + JMPIFNOT %A %B
 - CALL : Call another contract with the contract address in %A
   + CALL %A 

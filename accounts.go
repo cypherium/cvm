@@ -34,10 +34,10 @@ type ContractAccount struct {
 var contractCode0, _ = hex.DecodeString("51000151000251000155000100010002")
 
 //INC %1 INC %2 INC %1 ADD %1 %1 %2 INC %2 CALL %2
-var contractCode1, _ = hex.DecodeString("51000151000251000155000100010002510002060002")
+var contractCode1, _ = hex.DecodeString("51000151000251000155000100010002510002050002")
 
 //MOVI %16 $2 MOVI %14 $0xFF MOVI %15 $0xFF00 RET
-var contractCode2, _ = hex.DecodeString("42000F000242000D00FF42000EFF0007")
+var contractCode2, _ = hex.DecodeString("42000F000242000D00FF42000EFF0006")
 
 var storage0 = []byte{10, 20, 0, 50, 100}
 var storage1 = []byte{10, 20, 0}
