@@ -21,6 +21,7 @@
 package cvm
 
 import (
+	"golang.org/x/crypto/sha3"
 	"math/big"
 )
 
@@ -84,29 +85,28 @@ func opJmpifnot(cf *ContractFrame, regIdx []uint64, op *operation) error {
 func opCall(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	defer decrementGas(&cf.gas, op)
 	defer incrementPc(&cf.pc, op)
-	rf := cf.rf
-	idxA := regIdx[0]
-	//TODO replace with real public address
-	ctcAddr := uint64(rf.Read(idxA).Int64())
-	msgSzeBig := rf.Read(rf.regSze - 1)
-	msgSze := msgSzeBig.Uint64()
-	idxC := rf.regSze - (1 + msgSze)
-	amount := rf.Read(idxC)
-	var msg []byte
-	for i := 1; uint64(i) < msgSze; i++ {
-		idx := idxC + uint64(i)
-		msg = append(msg, rf.Read(idx).Bytes()...)
-	}
-	newCtc := NewContract(ctcAddr, cf.contract.Self, msg, amount,
-		cf.contract.GasLimit, cf.contract.GasPrice)
-	err := cf.CallContractFrame(newCtc)
-	if err != nil {
-		status := OpError{
-			OpName: op.name,
-			Cause:  err.Error(),
-		}
-		return status
-	}
+	//rf := cf.rf
+	//idxA := regIdx[0]
+	////TODO replace with real public address
+	//ctcAddr := uint64(rf.Read(idxA).Int64())
+	//msgSzeBig := rf.Read(rf.regSze - 1)
+	//msgSze := msgSzeBig.Uint64()
+	//idxC := rf.regSze - (1 + msgSze)
+	//amount := rf.Read(idxC)
+	//var msg []byte
+	//for i := 1; uint64(i) < msgSze; i++ {
+	//	idx := idxC + uint64(i)
+	//	msg = append(msg, rf.Read(idx).Bytes()...)
+	//}
+	//newCtc := NewContract(ctcAddr, cf.contract.Self, msg, amount, cf.contract.GasLimit, cf.contract.GasPrice)
+	//err := cf.CallContractFrame(newCtc)
+	//if err != nil {
+	//	status := OpError{
+	//		OpName: op.name,
+	//		Cause:  err.Error(),
+	//	}
+	//	return status
+	//}
 	return nil
 }
 
@@ -634,5 +634,17 @@ func opMin(cf *ContractFrame, regIdx []uint64, op *operation) error {
 	} else {
 		rf.Write(idxC, regB)
 	}
+	return nil
+}
+
+func opSHA3(cf *ContractFrame, regIdx []uint64, op *operation) error {
+	defer decrementGas(&cf.gas, op)
+	defer incrementPc(&cf.pc, op)
+	rf := cf.rf
+	idxA := regIdx[0]
+	idxB := regIdx[1]
+	regA := rf.Read(idxA).Bytes()
+	digest := sha3.Sum256(regA)
+	rf.Write(idxB, new(big.Int).SetBytes(digest[:]))
 	return nil
 }

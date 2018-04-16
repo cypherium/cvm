@@ -23,6 +23,7 @@ package cvm
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/syndtr/goleveldb/leveldb"
 	"log"
 	"os"
 )
@@ -38,13 +39,14 @@ type ContractFrame struct {
 	gas        uint64 //Remaining gas counter
 	Operations OperationSet
 
-	call   bool           //If this contract is called by another
-	caller *ContractFrame //Previous caller
-	sender *ContractFrame //Original caller
-	log    *log.Logger
+	call    bool           //If this contract is called by another
+	caller  *ContractFrame //Previous caller
+	sender  *ContractFrame //Original caller
+	log     *log.Logger
+	StateDB *leveldb.DB
 }
 
-func NewContractFrame(ctc *Contract) (cf *ContractFrame) {
+func NewContractFrame(ctc *Contract, db *leveldb.DB) (cf *ContractFrame) {
 	cf = &ContractFrame{
 		rf:         NewRegisterFile(),
 		mem:        NewMemory(),
@@ -57,6 +59,7 @@ func NewContractFrame(ctc *Contract) (cf *ContractFrame) {
 		caller:     nil,
 		sender:     nil,
 		log:        log.New(os.Stderr, "", 0),
+		StateDB:    db,
 	}
 	return
 }
