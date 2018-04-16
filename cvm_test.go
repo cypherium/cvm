@@ -21,38 +21,44 @@
 package cvm
 
 import (
+	"encoding/hex"
 	"fmt"
+	"github.com/syndtr/goleveldb/leveldb"
 	"math/big"
+	mrand "math/rand"
 	"testing"
+	"time"
 )
 
-type CVM struct {
-	GasLimit uint64
-	GasPrice *big.Int
-	cf       *ContractFrame
-}
-
 func TestCvmFunc(t *testing.T) {
-	cvm := CVM{
-		GasLimit: 1000,
-		GasPrice: big.NewInt(10),
+	var db *leveldb.DB = nil
+	mrand.Seed(time.Now().Unix())
+	code0, _ := hex.DecodeString("51000151000251000155000100010002")
+	contract0 := Contract{
+		Caller:   nil,
+		Self:     []byte("2E98"),
+		Code:     code0,
+		Input:    nil,
+		Storage:  nil,
+		GasLimit: mrand.Uint64() % 1000,
+		GasPrice: new(big.Int).SetUint64(mrand.Uint64() % 90000),
+		Balance:  new(big.Int).SetUint64(mrand.Uint64() % 9000),
 	}
-	//Create a VM contract instance using an account's public address
-	contract0 := NewContract(0, 0, nil, big.NewInt(100), cvm.GasLimit, cvm.GasPrice)
-	contract1 := NewContract(1, 0, nil, big.NewInt(100), cvm.GasLimit, cvm.GasPrice)
+
 	//Create a context associated with the given contract
-	cvm.cf = NewContractFrame(contract0)
-	if err := cvm.cf.Execute(); err != nil {
+	cf := NewContractFrame(&contract0, db)
+	if err := cf.Execute(); err != nil {
 		t.Errorf("%s\n", err.Error())
 	}
 	fmt.Printf("End of execution\n")
-	cvm.cf = NewContractFrame(contract1)
-	if err := cvm.cf.Execute(); err != nil {
-		t.Errorf("%s\n", err.Error())
-	}
-	fmt.Printf("End of execution\n")
+	//cf = NewContractFrame(contract1)
+	//if err := cvm.cf.Execute(); err != nil {
+	//	t.Errorf("%s\n", err.Error())
+	//}
+	//fmt.Printf("End of execution\n")
 }
 
+/*
 func TestCvmGas(t *testing.T) {
 	cvm := CVM{
 		GasLimit: 5,
@@ -73,3 +79,4 @@ func TestCvmGas(t *testing.T) {
 	}
 	fmt.Printf("End of execution\n")
 }
+*/
